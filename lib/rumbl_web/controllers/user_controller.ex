@@ -3,9 +3,12 @@ defmodule RumblWeb.UserController do
 
     alias Rumbl.Accounts
     alias Rumbl.Accounts.User
+    alias RumblWeb.Auth
+
+    plug :authenticate when action in [:index, :show]
 
     def index(conn, _params)do
-        users=Accounts.list_users()
+        users = Accounts.list_users()
         render(conn, "index.html", users: users )
     end
 
@@ -30,4 +33,14 @@ defmodule RumblWeb.UserController do
             end
     end
 
+    defp authenticate(conn, _opts) do 
+        if conn.assigns.current do
+            conn
+        else 
+            conn
+            |> put_flash(:erro, "You must be logged in to access that page")
+            |> redirect(to: Routes.page_path(conn, :index))
+            |> halt()
+        end
+    end
 end
