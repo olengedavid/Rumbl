@@ -7,7 +7,7 @@ defmodule RumblWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
-    plug  RumbleWeb.Auth
+    plug  RumblWeb.Auth
   end
 
   pipeline :api do
@@ -19,6 +19,7 @@ defmodule RumblWeb.Router do
 
     get "/", PageController, :index
     resources "/users", UserController, only: [:index, :show, :new, :create]
+    resources "/sessions", SessionController, only: [:create, :delete, :new]
   end
 
   # Other scopes may use custom stacks.
