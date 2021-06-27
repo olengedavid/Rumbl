@@ -6,7 +6,7 @@ defmodule Rumbl.Accounts.Credential do
     field :email, :string
     field :password, :string ,virtual: true
     field :password_hash, :string
-    belongs_to :user ,Rumbl.Accounts.User
+    belongs_to :user, Rumbl.Accounts.User
 
     timestamps()
   end
