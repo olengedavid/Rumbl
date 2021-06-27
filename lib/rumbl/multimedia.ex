@@ -11,44 +11,22 @@ defmodule Rumbl.Multimedia do
 
   @doc """
   Returns the list of videos.
-
-  ## Examples
-
-      iex> list_videos()
-      [%Video{}, ...]
-
   """
   def list_videos do
-    Repo.all(Video)
+    Video
+    |> Repo.all()
+    |> preload_user()
   end
 
   @doc """
   Gets a single video.
 
   Raises `Ecto.NoResultsError` if the Video does not exist.
-
-  ## Examples
-
-      iex> get_video!(123)
-      %Video{}
-
-      iex> get_video!(456)
-      ** (Ecto.NoResultsError)
-
   """
-  def get_video!(id), do: Repo.get!(Video, id)
+  def get_video!(id), do: preload_user(Repo.get!(Video, id))
 
   @doc """
   Creates a video.
-
-  ## Examples
-
-      iex> create_video(%{field: value})
-      {:ok, %Video{}}
-
-      iex> create_video(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
   """
   def create_video(%Accounts.User{} = user, attrs \\ %{}) do
     %Video{}
@@ -59,15 +37,6 @@ defmodule Rumbl.Multimedia do
 
   @doc """
   Updates a video.
-
-  ## Examples
-
-      iex> update_video(video, %{field: new_value})
-      {:ok, %Video{}}
-
-      iex> update_video(video, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
   """
   def update_video(%Video{} = video, attrs) do
     video
@@ -77,15 +46,6 @@ defmodule Rumbl.Multimedia do
 
   @doc """
   Deletes a video.
-
-  ## Examples
-
-      iex> delete_video(video)
-      {:ok, %Video{}}
-
-      iex> delete_video(video)
-      {:error, %Ecto.Changeset{}}
-
   """
   def delete_video(%Video{} = video) do
     Repo.delete(video)
@@ -93,21 +53,37 @@ defmodule Rumbl.Multimedia do
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking video changes.
-
-  ## Examples
-
-      iex> change_video(video)
-      %Ecto.Changeset{data: %Video{}}
-
   """
-  def change_video(%Accounts.User{} = user, %Video{} = video, attrs \\ %{}) do
+  def change_video(%Accounts.User{} = user, %Video{} = video) do
     video
-    |> Video.changeset(attrs)
+    |> Video.changeset(%{})
     |> put_user(user)
-   
   end
 
   def put_user(changeset, user) do
     Ecto.Changeset.put_assoc(changeset, :user, user)
   end
+
+  def list_user_videos(%Accounts.User{} = user) do
+    Video
+    |> user_videos_query(user)
+    |> Repo.all()
+    |> preload_user()
+  end
+
+  def get_user_video!(%Accounts.User{} = user, id) do
+    from(v in Video, where: v.id == ^id)
+    |> user_videos_query(user)
+    |> Repo.one!()
+    |> preload_user()
+  end
+
+  defp user_videos_query(query, %Accounts.User{id: user_id}) do
+    from(v in query, where: v.user_id == ^user_id )
+  end 
+
+  defp preload_user(video_or_videos) do
+    Repo.preload(video_or_videos, :user)
+  end
+
 end
