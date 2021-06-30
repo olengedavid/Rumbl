@@ -47,7 +47,7 @@ defmodule Rumbl.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.4"},
       {:comeonin, "~> 5.3.0"},
-      {:bcrypt_elixir, "~> 1.0"},
+      {:bcrypt_elixir, "~> 2.0"},
       {:pbkdf2_elixir, "~> 1.0"}
     ]
   end
